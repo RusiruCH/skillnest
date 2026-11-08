@@ -75,13 +75,38 @@ const topicRoutes = require('./routes/topicRoutes');
 const materialRoutes = require('./routes/materialRoutes');
 const playgroundRoutes = require('./routes/playgroundRoutes');
 
+// Module 03: Code Playground (Member 03 Modular Implementation)
+let modularPlaygroundRoutes;
+try {
+  const mod = require('./src/modules/playground/routes/playgroundRoutes.js');
+  modularPlaygroundRoutes = mod.default || mod;
+} catch (err) {
+  import('./src/modules/playground/routes/playgroundRoutes.js').then((mod) => {
+    modularPlaygroundRoutes = mod.default || mod;
+  }).catch((e) => {
+    console.error('[SkillNest Server] Failed to load modular playground routes:', e);
+  });
+}
+
 // Import route modules — Module 2 (Instructor & Course Approval Management)
 const adminApprovalRoutes = require('./routes/adminApprovalRoutes');
 const instructorApplicationRoutes = require('./routes/instructorApplicationRoutes');
 
-// Mount routes — Module 1
+// Mount routes — Module 1 & Module 3
 app.use('/api/auth', authRoutes);
 app.use('/api/courses', courseRoutes);
+
+// Member 03: Modular Code Playground endpoints (status, languages, execution, snippets)
+// Preserves legacy endpoints (/config, /history, /execute with sourceCode) via fall-through
+app.use('/api/playground', (req, res, next) => {
+  if (req.path === '/execute' && req.method === 'POST' && req.body && req.body.sourceCode && !req.body.code) {
+    return next();
+  }
+  if (modularPlaygroundRoutes) {
+    return modularPlaygroundRoutes(req, res, next);
+  }
+  next();
+});
 app.use('/api/playground', playgroundRoutes);
 
 // Nested routes for topics & materials

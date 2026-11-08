@@ -74,7 +74,12 @@ const SnippetSchema = new mongoose.Schema(
 );
 
 // Text index for searching snippets by title, description, and tags
-SnippetSchema.index({ title: 'text', description: 'text', tags: 'text' });
+// default_language: 'none' and language_override: 'none' disable natural language stemming
+// so programming languages (e.g. 'python', 'javascript', 'cpp', 'java', 'html') are not mistaken for spoken language stemmers
+SnippetSchema.index(
+  { title: 'text', description: 'text', tags: 'text' },
+  { default_language: 'none', language_override: 'none' }
+);
 
 const Snippet = mongoose.models.Snippet || mongoose.model('Snippet', SnippetSchema);
 
