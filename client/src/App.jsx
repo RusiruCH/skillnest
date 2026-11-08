@@ -21,7 +21,7 @@ import CourseApprovals from './pages/CourseApprovals';
 import ApprovalHistoryPage from './pages/ApprovalHistoryPage';
 import ApplyInstructorPage from './pages/ApplyInstructorPage';
 
-// Module 04: Hackathon Challenge Management (Member 04)
+// Module 04: Hackathon Challenge Management (Member 04 — H.A.K. Madushan)
 import ChallengesPage from './pages/ChallengesPage';
 import ChallengeDetailPage from './pages/ChallengeDetailPage';
 import InstructorChallengeDashboard from './pages/InstructorChallengeDashboard';
@@ -65,10 +65,11 @@ function App() {
               <Route path="/login" element={<LoginPage />} />
               <Route path="/register" element={<RegisterPage />} />
 
-              {/* Module 04: Hackathon Challenge Management Routes (Member 04) */}
+              {/* Module 04: Hackathon Challenge Management Routes (Member 04 — H.A.K. Madushan) */}
+              {/* NOTE: static segments (/my-submissions) MUST come before dynamic (:id) */}
               <Route path="/challenges" element={<ChallengesPage />} />
-              <Route path="/challenges/:id" element={<ChallengeDetailPage />} />
               <Route path="/challenges/my-submissions" element={<LearnerSubmissionsPage />} />
+              <Route path="/challenges/:id" element={<ChallengeDetailPage />} />
               <Route path="/instructor/challenges" element={<InstructorChallengeDashboard />} />
 
               {/* Module 06: Forum & Q&A Management Routes (Member 06) */}

@@ -37,6 +37,7 @@ app.get('/', (req, res) => {
     modules: {
       module1: 'Course & Learning Material Management — L.M.R.C.Bandara (SEU/IS/22/ICT/113)',
       module2: 'Instructor & Course Approval Management — Member 02',
+      module4: 'Hackathon Challenge Management — H.A.K. Madushan (feature/member-04-hackathon)',
     },
     status: 'Backend API Server is Running Successfully',
     frontendUrl: 'http://localhost:5173',
@@ -69,7 +70,7 @@ app.get('/api/health', (req, res) => {
   res.json({
     status: 'ok',
     platform: 'SkillNest API',
-    modules: ['Module 1 - Course & Learning Material Management', 'Module 2 - Instructor & Course Approval Management'],
+    modules: ['Module 1 - Course & Learning Material Management', 'Module 2 - Instructor & Course Approval Management', 'Module 4 - Hackathon Challenge Management — H.A.K. Madushan'],
     timestamp: new Date().toISOString(),
   });
 });
@@ -182,6 +183,7 @@ if (require.main === module) {
     console.log(` SkillNest API Server`);
     console.log(` Module 1: Course & Learning Material Management — L.M.R.C.Bandara`);
     console.log(` Module 2: Instructor & Course Approval Management — Member 02`);
+    console.log(` Module 4: Hackathon Challenge Management — H.A.K. Madushan`);
     console.log(` Server running on: http://localhost:${PORT}`);
     console.log('================================================================');
   });

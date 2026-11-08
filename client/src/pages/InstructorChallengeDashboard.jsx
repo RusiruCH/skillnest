@@ -54,7 +54,12 @@ export default function InstructorChallengeDashboard() {
       }
     } catch (err) {
       console.error(err);
-      setError('Could not load instructor dashboard: ' + (err.response?.data?.message || err.message));
+      const isNetworkError = !err.response && (err.message === 'Network Error' || err.code === 'ERR_NETWORK');
+      if (isNetworkError) {
+        setError('Backend server is offline. Start the server (node server.js) and click Refresh to load your challenges.');
+      } else {
+        setError('Could not load instructor dashboard: ' + (err.response?.data?.message || err.message));
+      }
     } finally {
       setLoading(false);
     }
