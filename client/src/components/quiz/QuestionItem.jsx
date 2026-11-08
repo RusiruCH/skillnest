@@ -1,28 +1,77 @@
 import React from 'react';
-import { CheckCircle, XCircle, Edit, Trash2 } from 'lucide-react';
+import { CheckCircle, XCircle, Edit, Trash2, ChevronUp, ChevronDown, GripVertical } from 'lucide-react';
 
 const QuestionItem = ({
   question,
   index,
+  total = 0,
   mode = 'attempt', // 'attempt' | 'review' | 'manage'
   selectedOptionId = null,
   onSelectOption = null,
   onEdit = null,
-  onDelete = null
+  onDelete = null,
+  onMoveUp = null,
+  onMoveDown = null,
+  // drag-and-drop props
+  draggable = false,
+  onDragStart = null,
+  onDragOver = null,
+  onDrop = null,
+  isDragOver = false
 }) => {
   return (
-    <div className="card" style={{ marginBottom: 16 }}>
+    <div
+      className="card"
+      style={{
+        marginBottom: 16,
+        opacity: isDragOver ? 0.6 : 1,
+        border: isDragOver ? '2px dashed var(--primary)' : undefined,
+        transition: 'opacity 0.15s, border 0.15s'
+      }}
+      draggable={draggable && mode === 'manage'}
+      onDragStart={onDragStart}
+      onDragOver={onDragOver}
+      onDrop={onDrop}
+    >
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
-        <h4 style={{ fontSize: '1rem', fontWeight: 600, color: 'var(--text-main)' }}>
-          <span style={{ color: 'var(--primary)', marginRight: 6 }}>Q{index + 1}.</span>
-          {question.questionText}
-        </h4>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flex: 1 }}>
+          {mode === 'manage' && (
+            <span
+              style={{ cursor: 'grab', color: 'var(--text-muted)', flexShrink: 0 }}
+              title="Drag to reorder"
+            >
+              <GripVertical size={16} />
+            </span>
+          )}
+          <h4 style={{ fontSize: '1rem', fontWeight: 600, color: 'var(--text-main)' }}>
+            <span style={{ color: 'var(--primary)', marginRight: 6 }}>Q{index + 1}.</span>
+            {question.questionText}
+          </h4>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
           <span className="badge" style={{ background: '#f1f5f9', color: '#475569' }}>
             {question.marks || 1} mark{question.marks > 1 ? 's' : ''}
           </span>
           {mode === 'manage' && (
             <>
+              <button
+                onClick={() => onMoveUp && onMoveUp(index)}
+                disabled={index === 0}
+                className="btn btn-outline"
+                style={{ padding: '4px 6px', opacity: index === 0 ? 0.4 : 1 }}
+                title="Move Up"
+              >
+                <ChevronUp size={14} />
+              </button>
+              <button
+                onClick={() => onMoveDown && onMoveDown(index)}
+                disabled={index === total - 1}
+                className="btn btn-outline"
+                style={{ padding: '4px 6px', opacity: index === total - 1 ? 0.4 : 1 }}
+                title="Move Down"
+              >
+                <ChevronDown size={14} />
+              </button>
               <button
                 onClick={() => onEdit(question)}
                 className="btn btn-outline"

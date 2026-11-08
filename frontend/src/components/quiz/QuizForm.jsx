@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import apiClient from '../../api/apiClient';
 
 const QuizForm = ({ initialData = {}, onSubmit, isSubmitting = false }) => {
   const formatDatetimeForInput = (dateVal) => {
@@ -8,13 +9,21 @@ const QuizForm = ({ initialData = {}, onSubmit, isSubmitting = false }) => {
     return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
   };
 
+  // Normalize courseId: if it's a populated object, extract _id string
+  const normalizeCourseId = (val) => {
+    if (!val) return '';
+    if (typeof val === 'object' && val._id) return val._id;
+    return String(val);
+  };
+
   const [formData, setFormData] = useState({
     title: initialData.title || '',
     description: initialData.description || '',
     instructions: initialData.instructions || 'Read each question carefully and select the best answer option. Submit before the timer expires.',
-    courseId: initialData.courseId || '',
+    courseId: normalizeCourseId(initialData.courseId),
     duration: initialData.duration || 30,
     passMark: initialData.passMark || 50,
+    maxAttempts: initialData.maxAttempts || 1,
     availableFrom: formatDatetimeForInput(initialData.availableFrom || new Date()),
     availableUntil: formatDatetimeForInput(
       initialData.availableUntil || new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
@@ -22,6 +31,27 @@ const QuizForm = ({ initialData = {}, onSubmit, isSubmitting = false }) => {
   });
 
   const [error, setError] = useState('');
+  const [courses, setCourses] = useState([]);
+  const [coursesLoading, setCoursesLoading] = useState(false);
+
+  // Fetch instructor's own courses for the dropdown
+  useEffect(() => {
+    const fetchCourses = async () => {
+      try {
+        setCoursesLoading(true);
+        const res = await apiClient.get('/courses/my-courses');
+        if (res.data.success) {
+          setCourses(res.data.courses || res.data.data || []);
+        }
+      } catch {
+        // Courses API unavailable — degrade gracefully (manual ID entry fallback)
+        setCourses([]);
+      } finally {
+        setCoursesLoading(false);
+      }
+    };
+    fetchCourses();
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -50,6 +80,11 @@ const QuizForm = ({ initialData = {}, onSubmit, isSubmitting = false }) => {
       return;
     }
 
+    if (!formData.maxAttempts || Number(formData.maxAttempts) < 1 || Number(formData.maxAttempts) > 20) {
+      setError('Maximum attempts must be between 1 and 20');
+      return;
+    }
+
     if (!formData.availableFrom || !formData.availableUntil) {
       setError('Please provide both available from and until dates');
       return;
@@ -70,7 +105,8 @@ const QuizForm = ({ initialData = {}, onSubmit, isSubmitting = false }) => {
       instructions: formData.instructions.trim(),
       courseId: formData.courseId ? formData.courseId : null,
       duration: Number(formData.duration),
-      passMark: Number(formData.passMark)
+      passMark: Number(formData.passMark),
+      maxAttempts: Number(formData.maxAttempts || 1)
     });
   };
 
@@ -124,7 +160,7 @@ const QuizForm = ({ initialData = {}, onSubmit, isSubmitting = false }) => {
         />
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 16 }}>
         <div className="form-group">
           <label className="form-label" htmlFor="duration">
             Duration (Minutes) *
@@ -154,6 +190,23 @@ const QuizForm = ({ initialData = {}, onSubmit, isSubmitting = false }) => {
             max="100"
             className="form-input"
             value={formData.passMark}
+            onChange={handleChange}
+            required
+          />
+        </div>
+
+        <div className="form-group">
+          <label className="form-label" htmlFor="maxAttempts">
+            Max Allowed Attempts *
+          </label>
+          <input
+            id="maxAttempts"
+            name="maxAttempts"
+            type="number"
+            min="1"
+            max="20"
+            className="form-input"
+            value={formData.maxAttempts}
             onChange={handleChange}
             required
           />
@@ -194,17 +247,39 @@ const QuizForm = ({ initialData = {}, onSubmit, isSubmitting = false }) => {
 
       <div className="form-group">
         <label className="form-label" htmlFor="courseId">
-          Course ID (Optional - Member 02 Integration)
+          Linked Course (Optional)
         </label>
-        <input
-          id="courseId"
-          name="courseId"
-          type="text"
-          className="form-input"
-          placeholder="MongoDB Course ObjectId (leave empty if standalone)"
-          value={formData.courseId}
-          onChange={handleChange}
-        />
+        {coursesLoading ? (
+          <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Loading courses…</p>
+        ) : courses.length > 0 ? (
+          <select
+            id="courseId"
+            name="courseId"
+            className="form-input"
+            value={formData.courseId}
+            onChange={handleChange}
+          >
+            <option value="">— No linked course (standalone quiz) —</option>
+            {courses.map((c) => (
+              <option key={c._id} value={c._id}>
+                {c.title}{c.category ? ` · ${c.category}` : ''}
+              </option>
+            ))}
+          </select>
+        ) : (
+          <input
+            id="courseId"
+            name="courseId"
+            type="text"
+            className="form-input"
+            placeholder="MongoDB Course ObjectId (leave empty if standalone)"
+            value={formData.courseId}
+            onChange={handleChange}
+          />
+        )}
+        <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginTop: 4 }}>
+          Linking a quiz to a course lets learners find it from the course page.
+        </p>
       </div>
 
       <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 12, marginTop: 12 }}>

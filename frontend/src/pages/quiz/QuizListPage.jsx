@@ -1,10 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Plus, Search, BookOpen, AlertCircle } from 'lucide-react';
+import { Plus, Search, BookOpen, AlertCircle, Award } from 'lucide-react';
 import apiClient from '../../api/apiClient';
 import QuizCard from '../../components/quiz/QuizCard';
+import { useAuth } from '../../context/AuthContext';
 
-const QuizListPage = ({ userRole = 'learner' }) => {
+const QuizListPage = ({ userRole: propRole }) => {
+  // Read authenticated user's role from AuthContext, with prop override support
+  const { user } = useAuth();
+  const userRole = propRole || user?.role || 'learner';
+
   const [quizzes, setQuizzes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -64,7 +69,7 @@ const QuizListPage = ({ userRole = 'learner' }) => {
     return matchesSearch && q.status === statusFilter;
   });
 
-  const isInstructorOrAdmin = userRole === 'instructor' || userRole === 'administrator';
+  const isInstructorOrAdmin = userRole === 'instructor' || userRole === 'admin' || userRole === 'administrator';
 
   return (
     <div className="container">
@@ -80,12 +85,20 @@ const QuizListPage = ({ userRole = 'learner' }) => {
           </p>
         </div>
 
-        {isInstructorOrAdmin && (
-          <Link to="/quizzes/create" className="btn btn-primary">
-            <Plus size={18} />
-            <span>Create New Quiz</span>
-          </Link>
-        )}
+        <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+          {!isInstructorOrAdmin && (
+            <Link to="/my-attempts" className="btn btn-secondary">
+              <Award size={18} />
+              <span>My Attempts</span>
+            </Link>
+          )}
+          {isInstructorOrAdmin && (
+            <Link to="/quizzes/create" className="btn btn-primary">
+              <Plus size={18} />
+              <span>Create New Quiz</span>
+            </Link>
+          )}
+        </div>
       </div>
 
       {error && (

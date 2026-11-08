@@ -34,6 +34,16 @@ const quizAttemptSchema = new mongoose.Schema(
       required: [true, 'Learner reference is required'],
       index: true
     },
+    attemptNumber: {
+      type: Number,
+      required: true,
+      default: 1,
+      min: [1, 'Attempt number must be at least 1']
+    },
+    isTestAttempt: {
+      type: Boolean,
+      default: false
+    },
     startedAt: {
       type: Date,
       required: true,
@@ -75,7 +85,7 @@ const quizAttemptSchema = new mongoose.Schema(
   }
 );
 
-// Compound unique index ensuring only one attempt per quiz per learner
-quizAttemptSchema.index({ quiz: 1, learner: 1 }, { unique: true });
+// Compound unique index ensuring only one attempt per number per quiz per learner
+quizAttemptSchema.index({ quiz: 1, learner: 1, attemptNumber: 1 }, { unique: true });
 
 module.exports = mongoose.model('QuizAttempt', quizAttemptSchema);

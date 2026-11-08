@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
-import { ArrowLeft, Plus, CheckCircle, HelpCircle } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { useParams, Link, useNavigate } from 'react-router-dom';
+import { ArrowLeft, Plus, CheckCircle, HelpCircle, Eye } from 'lucide-react';
 import apiClient from '../../api/apiClient';
 import QuizForm from '../../components/quiz/QuizForm';
 import QuestionItem from '../../components/quiz/QuestionItem';
@@ -8,6 +8,7 @@ import QuestionModal from '../../components/quiz/QuestionModal';
 
 const QuizEditPage = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
 
   const [quiz, setQuiz] = useState(null);
   const [questions, setQuestions] = useState([]);
@@ -15,6 +16,12 @@ const QuizEditPage = () => {
   const [error, setError] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
   const [activeTab, setActiveTab] = useState('questions'); // 'questions' | 'settings'
+  const [previewLoading, setPreviewLoading] = useState(false);
+
+  // Drag-and-drop state
+  const dragIndexRef = useRef(null);
+  const [dragOverIndex, setDragOverIndex] = useState(null);
+  const [reordering, setReordering] = useState(false);
 
   // Modal state
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -125,6 +132,93 @@ const QuizEditPage = () => {
     }
   };
 
+  // ── Question ordering helpers ──────────────────────────────────────────────
+
+  const persistOrder = async (reordered) => {
+    try {
+      setReordering(true);
+      await apiClient.patch(`/quizzes/${id}/questions/reorder`, {
+        questionIds: reordered.map((q) => q._id)
+      });
+      setSuccessMsg('Question order saved!');
+    } catch (err) {
+      setError('Failed to save question order. Please try again.');
+    } finally {
+      setReordering(false);
+    }
+  };
+
+  const handleMoveUp = (index) => {
+    if (index === 0) return;
+    const reordered = [...questions];
+    [reordered[index - 1], reordered[index]] = [reordered[index], reordered[index - 1]];
+    setQuestions(reordered);
+    persistOrder(reordered);
+  };
+
+  const handleMoveDown = (index) => {
+    if (index === questions.length - 1) return;
+    const reordered = [...questions];
+    [reordered[index], reordered[index + 1]] = [reordered[index + 1], reordered[index]];
+    setQuestions(reordered);
+    persistOrder(reordered);
+  };
+
+  // Drag-and-drop handlers
+  const handleDragStart = (index) => {
+    dragIndexRef.current = index;
+  };
+
+  const handleDragOver = (e, index) => {
+    e.preventDefault();
+    setDragOverIndex(index);
+  };
+
+  const handleDrop = (e, dropIndex) => {
+    e.preventDefault();
+    const dragIndex = dragIndexRef.current;
+    if (dragIndex === null || dragIndex === dropIndex) {
+      setDragOverIndex(null);
+      dragIndexRef.current = null;
+      return;
+    }
+    const reordered = [...questions];
+    const [dragged] = reordered.splice(dragIndex, 1);
+    reordered.splice(dropIndex, 0, dragged);
+    setQuestions(reordered);
+    persistOrder(reordered);
+    setDragOverIndex(null);
+    dragIndexRef.current = null;
+  };
+
+  const handleDragEnd = () => {
+    setDragOverIndex(null);
+    dragIndexRef.current = null;
+  };
+
+  // ── Instructor Preview ─────────────────────────────────────────────────────
+
+  const handlePreview = async () => {
+    if (questions.length === 0) {
+      setError('Add at least one question before previewing.');
+      return;
+    }
+    try {
+      setError('');
+      setPreviewLoading(true);
+      const res = await apiClient.post('/attempts/start', { quizId: id });
+      if (res.data.success) {
+        navigate(`/quizzes/${id}/attempt`, { state: res.data.data });
+      }
+    } catch (err) {
+      setError(err.message || 'Failed to launch preview');
+    } finally {
+      setPreviewLoading(false);
+    }
+  };
+
+  // ── Render guards ──────────────────────────────────────────────────────────
+
   const openAddModal = () => {
     setEditingQuestion(null);
     setIsModalOpen(true);
@@ -161,6 +255,15 @@ const QuizEditPage = () => {
           <ArrowLeft size={16} /> Back to Quizzes
         </Link>
         <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+          <button
+            onClick={handlePreview}
+            disabled={previewLoading || questions.length === 0}
+            className="btn btn-outline"
+            title={questions.length === 0 ? 'Add questions first' : 'Preview the learner-facing quiz interface'}
+          >
+            <Eye size={16} />
+            <span>{previewLoading ? 'Launching...' : 'Preview as Learner'}</span>
+          </button>
           <button
             onClick={handleTogglePublish}
             className={`btn ${quiz.isPublished ? 'btn-outline' : 'btn-primary'}`}
@@ -221,7 +324,7 @@ const QuizEditPage = () => {
             color: activeTab === 'settings' ? 'var(--primary)' : 'var(--text-muted)'
           }}
         >
-          Quiz Settings & Timing
+          Quiz Settings &amp; Timing
         </button>
       </div>
 
@@ -229,11 +332,24 @@ const QuizEditPage = () => {
       {activeTab === 'questions' && (
         <div>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-            <h3 style={{ fontSize: '1.15rem', fontWeight: 700 }}>Question Bank</h3>
+            <div>
+              <h3 style={{ fontSize: '1.15rem', fontWeight: 700 }}>Question Bank</h3>
+              {questions.length > 1 && (
+                <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: 2 }}>
+                  Drag questions to reorder, or use the ▲ ▼ buttons. Order is saved to MongoDB.
+                </p>
+              )}
+            </div>
             <button onClick={openAddModal} className="btn btn-primary" style={{ padding: '8px 14px' }}>
               <Plus size={16} /> Add MCQ Question
             </button>
           </div>
+
+          {reordering && (
+            <div style={{ fontSize: '0.8rem', color: 'var(--primary)', marginBottom: 8 }}>
+              Saving order…
+            </div>
+          )}
 
           {questions.length === 0 ? (
             <div className="card" style={{ textAlign: 'center', padding: '40px 20px', color: 'var(--text-muted)' }}>
@@ -247,15 +363,23 @@ const QuizEditPage = () => {
               </button>
             </div>
           ) : (
-            <div>
+            <div onDragEnd={handleDragEnd}>
               {questions.map((q, idx) => (
                 <QuestionItem
                   key={q._id}
                   question={q}
                   index={idx}
+                  total={questions.length}
                   mode="manage"
                   onEdit={openEditModal}
                   onDelete={handleDeleteQuestion}
+                  onMoveUp={handleMoveUp}
+                  onMoveDown={handleMoveDown}
+                  draggable={true}
+                  onDragStart={() => handleDragStart(idx)}
+                  onDragOver={(e) => handleDragOver(e, idx)}
+                  onDrop={(e) => handleDrop(e, idx)}
+                  isDragOver={dragOverIndex === idx}
                 />
               ))}
             </div>

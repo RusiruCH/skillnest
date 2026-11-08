@@ -47,6 +47,13 @@ const quizSchema = new mongoose.Schema(
       max: [100, 'Pass mark cannot exceed 100%'],
       default: 50
     },
+    maxAttempts: {
+      type: Number,
+      required: [true, 'Maximum attempts is required'],
+      min: [1, 'Maximum attempts must be at least 1'],
+      max: [20, 'Maximum attempts cannot exceed 20'],
+      default: 1
+    },
     totalMarks: {
       type: Number,
       default: 0
