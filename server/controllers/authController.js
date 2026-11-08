@@ -2,9 +2,15 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 
 const generateToken = (id) => {
+  const secret = process.env.JWT_SECRET;
+  if (!secret) {
+    if (process.env.NODE_ENV === 'production') {
+      throw new Error('JWT_SECRET is mandatory in production environment');
+    }
+  }
   return jwt.sign(
     { id },
-    process.env.JWT_SECRET || 'skillnest_jwt_secret_key_member01_bandara_2026',
+    secret || 'skillnest_jwt_secret_key_member01_bandara_2026',
     {
       expiresIn: process.env.JWT_EXPIRES_IN || '7d',
     }
