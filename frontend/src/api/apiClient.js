@@ -37,8 +37,11 @@ const apiClient = axios.create({
 // Dynamic request interceptor
 apiClient.interceptors.request.use(
   (config) => {
-    const token = tokenProvider();
-    if (token) {
+    let token = tokenProvider();
+    if (!token && typeof window !== 'undefined' && window.localStorage) {
+      token = localStorage.getItem('skillnest_token');
+    }
+    if (token && !token.startsWith('demo_')) {
       config.headers.Authorization = `Bearer ${token}`;
     }
     return config;

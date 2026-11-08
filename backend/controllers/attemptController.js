@@ -25,7 +25,6 @@ const startAttempt = async (req, res, next) => {
         message: 'Quiz not found'
       });
     }
-
     // Availability validation on server
     if (!quiz.isPublished) {
       return res.status(400).json({
@@ -275,10 +274,10 @@ const getAttemptById = async (req, res, next) => {
     }
 
     const isOwner = attempt.learner?._id?.toString() === req.user._id.toString() ||
-                    attempt.learner?.toString() === req.user._id.toString();
+      attempt.learner?.toString() === req.user._id.toString();
     const isInstructor = req.user.role === 'instructor' &&
       attempt.quiz?.instructor?.toString() === req.user._id.toString();
-    const isAdmin = req.user.role === 'administrator';
+    const isAdmin = req.user.role === 'admin' || req.user.role === 'administrator';
 
     if (!isOwner && !isInstructor && !isAdmin) {
       return res.status(403).json({

@@ -26,32 +26,32 @@ const { protect, authorize } = require('../middleware/authMiddleware');
 router
   .route('/')
   .get(protect, getQuizzes)
-  .post(protect, authorize('instructor', 'administrator'), createQuiz);
+  .post(protect, authorize('instructor', 'admin', 'administrator'), createQuiz);
 
 router
   .route('/:id')
   .get(protect, getQuizById)
-  .put(protect, authorize('instructor', 'administrator'), updateQuiz)
-  .delete(protect, authorize('instructor', 'administrator'), deleteQuiz);
+  .put(protect, authorize('instructor', 'admin', 'administrator'), updateQuiz)
+  .delete(protect, authorize('instructor', 'admin', 'administrator'), deleteQuiz);
 
 router
   .route('/:id/publish')
-  .patch(protect, authorize('instructor', 'administrator'), togglePublishQuiz);
+  .patch(protect, authorize('instructor', 'admin', 'administrator'), togglePublishQuiz);
 
 // Quiz Questions routes
 router
   .route('/:quizId/questions')
   .get(protect, getQuizQuestions)
-  .post(protect, authorize('instructor', 'administrator'), addQuestion);
+  .post(protect, authorize('instructor', 'admin', 'administrator'), addQuestion);
 
 router
   .route('/:quizId/questions/:questionId')
-  .put(protect, authorize('instructor', 'administrator'), updateQuestion)
-  .delete(protect, authorize('instructor', 'administrator'), deleteQuestion);
+  .put(protect, authorize('instructor', 'admin', 'administrator'), updateQuestion)
+  .delete(protect, authorize('instructor', 'admin', 'administrator'), deleteQuestion);
 
 // Quiz Submissions for Instructors/Admins
 router
   .route('/:quizId/attempts')
-  .get(protect, authorize('instructor', 'administrator'), getQuizSubmissions);
+  .get(protect, authorize('instructor', 'admin', 'administrator'), getQuizSubmissions);
 
 module.exports = router;

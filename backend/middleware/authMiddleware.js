@@ -32,7 +32,7 @@ const protect = async (req, res, next) => {
     try {
       const decoded = jwt.verify(
         token,
-        process.env.JWT_SECRET || 'skillnest_jwt_shared_secret_2026'
+        process.env.JWT_SECRET || 'skillnest_jwt_secret_key_member01_bandara_2026'
       );
 
       // Populate standardized req.user
@@ -74,8 +74,12 @@ const protect = async (req, res, next) => {
  * @param  {...string} roles Allowed roles ('administrator', 'instructor', 'learner')
  */
 const authorize = (...roles) => {
+  const allowedRoles = [...roles];
+  if (roles.includes('admin') && !allowedRoles.includes('administrator')) allowedRoles.push('administrator');
+  if (roles.includes('administrator') && !allowedRoles.includes('admin')) allowedRoles.push('admin');
+
   return (req, res, next) => {
-    if (!req.user || !roles.includes(req.user.role)) {
+    if (!req.user || !allowedRoles.includes(req.user.role)) {
       return res.status(403).json({
         success: false,
         message: `Forbidden: Role '${req.user?.role || 'unassigned'}' is not authorized to access this resource`
