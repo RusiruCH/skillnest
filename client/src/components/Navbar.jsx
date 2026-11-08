@@ -10,6 +10,7 @@ import {
   UserCheck,
   Code,
   Shield,
+  MessageSquare,
 } from 'lucide-react';
 
 const Navbar = () => {
@@ -103,6 +104,19 @@ const Navbar = () => {
           >
             <Code className="w-4 h-4 text-purple-500" />
             Challenges
+          </Link>
+
+          {/* Module 06: Community Forum & Q&A */}
+          <Link
+            to="/forum"
+            className={`px-3.5 py-2 rounded-xl text-sm font-semibold transition flex items-center gap-2 ${
+              isActive('/forum') || location.pathname.startsWith('/forum')
+                ? 'bg-indigo-50 text-indigo-600 font-bold'
+                : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+            }`}
+          >
+            <MessageSquare className="w-4 h-4 text-indigo-500" />
+            Forum & Q&A
           </Link>
 
           {user?.role === 'learner' && (
