@@ -22,7 +22,7 @@ import {
 export default function ChallengeDetailPage() {
   const { id: challengeId } = useParams();
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, isAuthenticated } = useAuth();
   const [challenge, setChallenge] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -41,27 +41,39 @@ export default function ChallengeDetailPage() {
 
   const fetchChallengeDetails = async () => {
     setLoading(true);
+
+    // --- Block 1: Load the challenge (fatal — show error if this fails) ---
+    let challengeData = null;
     try {
       const res = await challengeService.getChallengeById(challengeId);
+      challengeData = res.data;
       setChallenge(res.data);
 
       const starter =
         res.data.starterCode?.[language] ||
         `// Solution for ${res.data.title}\nfunction solve() {\n  // Write your logic here\n}\n`;
       setSourceCode(starter);
+    } catch (err) {
+      setError('Could not load challenge details: ' + (err.response?.data?.message || err.message));
+      setLoading(false);
+      return;
+    }
 
-      if (user?.role === 'learner') {
+    // --- Block 2: Load past submissions (non-fatal — silently skipped if auth fails) ---
+    if (isAuthenticated && user?.role === 'learner') {
+      try {
         const subRes = await submissionService.getMySubmissions();
         const mySubsForThis = (subRes.data || []).filter(
           (s) => (s.challengeId?._id || s.challengeId) === challengeId
         );
         setChallengeSubmissions(mySubsForThis);
+      } catch {
+        // Demo tokens or expired sessions will 401 here — not fatal, just skip
+        setChallengeSubmissions([]);
       }
-    } catch (err) {
-      setError('Could not load challenge details: ' + (err.response?.data?.message || err.message));
-    } finally {
-      setLoading(false);
     }
+
+    setLoading(false);
   };
 
   useEffect(() => {
@@ -361,7 +373,11 @@ export default function ChallengeDetailPage() {
 
                 <div className="flex items-center justify-between pt-2">
                   <div className="text-[11px] text-slate-400">
-                    {user?.role !== 'learner' ? (
+                    {!isAuthenticated ? (
+                      <span className="text-blue-400 font-semibold">
+                        Please log in with your account to submit solutions.
+                      </span>
+                    ) : user?.role !== 'learner' ? (
                       <span className="text-amber-400 font-semibold">
                         * Logged in as {user?.role}. Switch to 'Learner' to submit solutions.
                       </span>
@@ -376,7 +392,7 @@ export default function ChallengeDetailPage() {
 
                   <button
                     type="submit"
-                    disabled={submitting || isExpired || user?.role !== 'learner'}
+                    disabled={submitting || isExpired || user?.role !== 'learner' || !isAuthenticated}
                     className="flex items-center gap-2 px-6 py-3 rounded-xl font-bold text-xs text-white bg-purple-600 hover:bg-purple-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg shadow-purple-600/30 active:scale-95"
                   >
                     <Send className={`w-4 h-4 ${submitting ? 'animate-pulse' : ''}`} />
