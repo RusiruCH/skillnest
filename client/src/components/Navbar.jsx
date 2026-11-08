@@ -134,16 +134,29 @@ const Navbar = () => {
           </Link>
 
           {user?.role === 'learner' && (
-            <Link
-              to="/challenges/my-submissions"
-              className={`px-3.5 py-2 rounded-xl text-sm font-semibold transition flex items-center gap-2 ${
-                isActive('/challenges/my-submissions')
-                  ? 'bg-purple-50 text-purple-600 font-bold'
-                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
-              }`}
-            >
-              My Submissions
-            </Link>
+            <>
+              <Link
+                to="/my-attempts"
+                className={`px-3.5 py-2 rounded-xl text-sm font-semibold transition flex items-center gap-2 ${
+                  isActive('/my-attempts')
+                    ? 'bg-amber-50 text-amber-600 font-bold'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                }`}
+              >
+                <Award className="w-4 h-4 text-amber-500" />
+                My Attempts
+              </Link>
+              <Link
+                to="/challenges/my-submissions"
+                className={`px-3.5 py-2 rounded-xl text-sm font-semibold transition flex items-center gap-2 ${
+                  isActive('/challenges/my-submissions')
+                    ? 'bg-purple-50 text-purple-600 font-bold'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                }`}
+              >
+                My Submissions
+              </Link>
+            </>
           )}
 
           {user?.role === 'admin' && (

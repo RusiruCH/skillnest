@@ -275,9 +275,60 @@ const deleteQuestion = async (req, res, next) => {
   }
 };
 
+// @desc    Reorder questions in a quiz
+// @route   PATCH /api/quizzes/:quizId/questions/reorder
+// @access  Protected (Instructor [owner], Administrator)
+const reorderQuestions = async (req, res, next) => {
+  try {
+    const quiz = await Quiz.findById(req.params.quizId);
+    if (!quiz) {
+      return res.status(404).json({ success: false, message: 'Quiz not found' });
+    }
+
+    // Ownership check
+    if (
+      req.user.role === 'instructor' &&
+      quiz.instructor.toString() !== req.user._id.toString()
+    ) {
+      return res.status(403).json({
+        success: false,
+        message: 'Forbidden: You can only reorder questions in your own quiz'
+      });
+    }
+
+    const { questionIds } = req.body;
+    if (!questionIds || !Array.isArray(questionIds)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Please provide an array of questionIds in the desired sequence'
+      });
+    }
+
+    // Update each question's order in parallel
+    const updatePromises = questionIds.map((id, index) =>
+      QuizQuestion.updateOne({ _id: id, quiz: quiz._id }, { $set: { order: index } })
+    );
+    await Promise.all(updatePromises);
+
+    const updatedQuestions = await QuizQuestion.find({ quiz: quiz._id })
+      .select('+correctOptionId +explanation')
+      .sort({ order: 1, createdAt: 1 });
+
+    res.status(200).json({
+      success: true,
+      message: 'Questions reordered successfully',
+      count: updatedQuestions.length,
+      data: updatedQuestions
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   getQuizQuestions,
   addQuestion,
   updateQuestion,
-  deleteQuestion
+  deleteQuestion,
+  reorderQuestions
 };

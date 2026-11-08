@@ -14,7 +14,8 @@ const {
   getQuizQuestions,
   addQuestion,
   updateQuestion,
-  deleteQuestion
+  deleteQuestion,
+  reorderQuestions
 } = require('../controllers/questionController');
 
 const { getQuizSubmissions } = require('../controllers/attemptController');
@@ -43,6 +44,10 @@ router
   .route('/:quizId/questions')
   .get(protect, getQuizQuestions)
   .post(protect, authorize('instructor', 'admin', 'administrator'), addQuestion);
+
+router
+  .route('/:quizId/questions/reorder')
+  .patch(protect, authorize('instructor', 'admin', 'administrator'), reorderQuestions);
 
 router
   .route('/:quizId/questions/:questionId')

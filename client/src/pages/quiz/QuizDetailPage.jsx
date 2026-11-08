@@ -1,9 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { Clock, Award, Calendar, AlertTriangle, ArrowLeft, Play } from 'lucide-react';
+import { Clock, Award, Calendar, AlertTriangle, ArrowLeft, Play, BookOpen } from 'lucide-react';
 import apiClient from '../../api/apiClient';
+import { useAuth } from '../../context/AuthContext';
 
-const QuizDetailPage = ({ userRole = 'learner' }) => {
+const QuizDetailPage = ({ userRole: propRole }) => {
+  // Read authenticated user's role from AuthContext, with prop override support
+  const { user } = useAuth();
+  const userRole = propRole || user?.role || 'learner';
   const { id } = useParams();
   const navigate = useNavigate();
 
@@ -102,6 +106,17 @@ const QuizDetailPage = ({ userRole = 'learner' }) => {
           </p>
         )}
 
+        {/* Linked Course */}
+        {quiz.courseId && (quiz.courseId.title || quiz.courseId._id) && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 20, padding: '10px 14px', background: '#f0f9ff', border: '1px solid #bae6fd', borderRadius: 8, fontSize: '0.9rem' }}>
+            <BookOpen size={16} color="#0369a1" />
+            <span style={{ color: '#0369a1', fontWeight: 600 }}>
+              Linked Course: {quiz.courseId.title || String(quiz.courseId)}
+              {quiz.courseId.category && <span style={{ fontWeight: 400, color: '#0284c7' }}> · {quiz.courseId.category}</span>}
+            </span>
+          </div>
+        )}
+
         {/* Quiz Metrics Grid */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 16, marginBottom: 28, background: '#f8fafc', padding: 18, borderRadius: 8 }}>
           <div>
@@ -123,6 +138,13 @@ const QuizDetailPage = ({ userRole = 'learner' }) => {
             <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 4, fontSize: '0.9rem', fontWeight: 600 }}>
               <Calendar size={18} color="var(--primary)" />
               <span>{new Date(quiz.availableFrom).toLocaleDateString()} – {new Date(quiz.availableUntil).toLocaleDateString()}</span>
+            </div>
+          </div>
+          <div>
+            <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 600 }}>Max Attempts</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 4, fontWeight: 700, fontSize: '1.1rem' }}>
+              <Award size={18} color="var(--primary)" />
+              <span>{quiz.maxAttempts || 1} Allowed</span>
             </div>
           </div>
         </div>
@@ -161,13 +183,24 @@ const QuizDetailPage = ({ userRole = 'learner' }) => {
             <span>{starting ? 'Starting Assessment...' : 'Start Quiz Attempt'}</span>
           </button>
         ) : (
-          <Link
-            to={`/quizzes/${quiz._id}/edit`}
-            className="btn btn-outline"
-            style={{ width: '100%', padding: '12px' }}
-          >
-            Manage Quiz & Questions (Instructor Mode)
-          </Link>
+          <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+            <button
+              onClick={handleStartAttempt}
+              disabled={starting}
+              className="btn btn-primary"
+              style={{ flex: 1, padding: '12px' }}
+            >
+              <Play size={18} />
+              <span>{starting ? 'Launching Preview...' : 'Preview & Test Quiz (Instructor Mode)'}</span>
+            </button>
+            <Link
+              to={`/quizzes/${quiz._id}/edit`}
+              className="btn btn-outline"
+              style={{ flex: 1, padding: '12px', textAlign: 'center' }}
+            >
+              Manage Quiz & Questions
+            </Link>
+          </div>
         )}
       </div>
     </div>

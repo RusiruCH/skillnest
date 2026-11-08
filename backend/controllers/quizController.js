@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const Quiz = require('../models/Quiz');
 const QuizQuestion = require('../models/QuizQuestion');
 const QuizAttempt = require('../models/QuizAttempt');
@@ -29,7 +30,11 @@ const getQuizzes = async (req, res, next) => {
       filter.courseId = req.query.courseId;
     }
 
-    const quizzes = await Quiz.find(filter).sort({ createdAt: -1 });
+    let query = Quiz.find(filter).sort({ createdAt: -1 });
+    if (mongoose.models && mongoose.models.Course) {
+      query = query.populate('courseId', 'title category level');
+    }
+    const quizzes = await query;
 
     res.status(200).json({
       success: true,
@@ -46,7 +51,11 @@ const getQuizzes = async (req, res, next) => {
 // @access  Protected
 const getQuizById = async (req, res, next) => {
   try {
-    const quiz = await Quiz.findById(req.params.id);
+    let query = Quiz.findById(req.params.id);
+    if (mongoose.models && mongoose.models.Course) {
+      query = query.populate('courseId', 'title category level');
+    }
+    const quiz = await query;
 
     if (!quiz) {
       return res.status(404).json({
@@ -89,6 +98,7 @@ const createQuiz = async (req, res, next) => {
       courseId,
       duration,
       passMark,
+      maxAttempts,
       availableFrom,
       availableUntil
     } = req.body;
@@ -98,6 +108,24 @@ const createQuiz = async (req, res, next) => {
         success: false,
         message: 'Please provide title, duration, availableFrom, and availableUntil'
       });
+    }
+
+    // Validate courseId ownership if provided
+    if (courseId && mongoose.models && mongoose.models.Course) {
+      const course = await mongoose.model('Course').findById(courseId);
+      if (!course) {
+        return res.status(404).json({ success: false, message: 'Linked course not found' });
+      }
+      if (
+        req.user.role === 'instructor' &&
+        course.instructor &&
+        course.instructor.toString() !== req.user._id.toString()
+      ) {
+        return res.status(403).json({
+          success: false,
+          message: 'Forbidden: You can only link a quiz to a course you own'
+        });
+      }
     }
 
     const startDate = new Date(availableFrom);
@@ -118,6 +146,7 @@ const createQuiz = async (req, res, next) => {
       instructor: req.user._id,
       duration: Number(duration),
       passMark: passMark !== undefined ? Number(passMark) : 50,
+      maxAttempts: maxAttempts !== undefined ? Number(maxAttempts) : 1,
       availableFrom: startDate,
       availableUntil: endDate,
       isPublished: false
@@ -165,6 +194,7 @@ const updateQuiz = async (req, res, next) => {
       courseId,
       duration,
       passMark,
+      maxAttempts,
       availableFrom,
       availableUntil
     } = req.body;
@@ -179,12 +209,30 @@ const updateQuiz = async (req, res, next) => {
       });
     }
 
+    if (courseId !== undefined && courseId && mongoose.models && mongoose.models.Course) {
+      const course = await mongoose.model('Course').findById(courseId);
+      if (!course) {
+        return res.status(404).json({ success: false, message: 'Linked course not found' });
+      }
+      if (
+        req.user.role === 'instructor' &&
+        course.instructor &&
+        course.instructor.toString() !== req.user._id.toString()
+      ) {
+        return res.status(403).json({
+          success: false,
+          message: 'Forbidden: You can only link a quiz to a course you own'
+        });
+      }
+    }
+
     if (title) quiz.title = title;
     if (description !== undefined) quiz.description = description;
     if (instructions !== undefined) quiz.instructions = instructions;
     if (courseId !== undefined) quiz.courseId = courseId || null;
     if (duration !== undefined) quiz.duration = Number(duration);
     if (passMark !== undefined) quiz.passMark = Number(passMark);
+    if (maxAttempts !== undefined) quiz.maxAttempts = Number(maxAttempts);
     quiz.availableFrom = startDate;
     quiz.availableUntil = endDate;
 

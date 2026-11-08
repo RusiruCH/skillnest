@@ -5,11 +5,12 @@ const QuizAttempt = require('../models/QuizAttempt');
 
 // @desc    Start a quiz attempt
 // @route   POST /api/attempts/start
-// @access  Protected (Learner)
+// @access  Protected (Learner, Instructor [self-test on own quiz], Administrator)
 const startAttempt = async (req, res, next) => {
   try {
     const { quizId } = req.body;
-    const learnerId = req.user._id;
+    const userId = req.user._id;
+    const userRole = req.user.role;
 
     if (!quizId) {
       return res.status(400).json({
@@ -25,66 +26,97 @@ const startAttempt = async (req, res, next) => {
         message: 'Quiz not found'
       });
     }
-    // Availability validation on server
-    if (!quiz.isPublished) {
-      return res.status(400).json({
+
+    // TASK 2: Instructor Self-Test Permission
+    const isInstructor = userRole === 'instructor';
+    const isOwnerInstructor = isInstructor && quiz.instructor.toString() === userId.toString();
+
+    // Security Rule: Instructors can NEVER access or attempt another instructor's quizzes
+    if (isInstructor && !isOwnerInstructor) {
+      return res.status(403).json({
         success: false,
-        message: 'This quiz is not published and cannot be attempted'
+        message: 'Forbidden: Instructors are only permitted to preview and test quizzes they own'
       });
     }
 
-    const now = new Date();
-    if (now < new Date(quiz.availableFrom)) {
-      return res.status(400).json({
-        success: false,
-        message: `This quiz is not available yet. It will open on ${new Date(quiz.availableFrom).toLocaleString()}`
-      });
-    }
-
-    if (now > new Date(quiz.availableUntil)) {
-      return res.status(400).json({
-        success: false,
-        message: `This quiz has expired. It closed on ${new Date(quiz.availableUntil).toLocaleString()}`
-      });
-    }
-
-    // Check if attempt already exists for this learner & quiz
-    const existingAttempt = await QuizAttempt.findOne({
-      quiz: quiz._id,
-      learner: learnerId
-    });
-
-    if (existingAttempt) {
-      if (existingAttempt.status === 'in_progress') {
-        // Return ongoing attempt so the learner can continue
-        // CRITICAL: questions WITHOUT correctOptionId or explanation!
-        const sanitizedQuestions = await QuizQuestion.find({ quiz: quiz._id }).sort({ order: 1 });
-        return res.status(200).json({
-          success: true,
-          message: 'Resuming existing active attempt',
-          data: {
-            attempt: existingAttempt,
-            quiz: {
-              _id: quiz._id,
-              title: quiz.title,
-              instructions: quiz.instructions,
-              duration: quiz.duration,
-              totalMarks: quiz.totalMarks,
-              passMark: quiz.passMark
-            },
-            questions: sanitizedQuestions
-          }
-        });
-      } else {
-        return res.status(409).json({
+    // Availability validation on server (owner instructors can preview drafts before publishing or opening)
+    if (!isOwnerInstructor) {
+      if (!quiz.isPublished) {
+        return res.status(400).json({
           success: false,
-          message: 'You have already submitted an attempt for this quiz. Multiple attempts are not permitted.',
-          attemptId: existingAttempt._id
+          message: 'This quiz is not published and cannot be attempted'
+        });
+      }
+
+      const now = new Date();
+      if (now < new Date(quiz.availableFrom)) {
+        return res.status(400).json({
+          success: false,
+          message: `This quiz is not available yet. It will open on ${new Date(quiz.availableFrom).toLocaleString()}`
+        });
+      }
+
+      if (now > new Date(quiz.availableUntil)) {
+        return res.status(400).json({
+          success: false,
+          message: `This quiz has expired. It closed on ${new Date(quiz.availableUntil).toLocaleString()}`
         });
       }
     }
 
-    // Fetch questions securely without answer keys
+    // 1. Check if an active attempt is currently in progress for this user & quiz
+    const activeAttempt = await QuizAttempt.findOne({
+      quiz: quiz._id,
+      learner: userId,
+      status: 'in_progress'
+    });
+
+    if (activeAttempt) {
+      // Return ongoing attempt so the learner or instructor can continue
+      // CRITICAL SECURITY: questions without correctOptionId or explanation!
+      const sanitizedQuestions = await QuizQuestion.find({ quiz: quiz._id }).sort({ order: 1 });
+      return res.status(200).json({
+        success: true,
+        message: isOwnerInstructor
+          ? 'Resuming active instructor preview test attempt'
+          : 'Resuming existing active attempt',
+        data: {
+          attempt: activeAttempt,
+          quiz: {
+            _id: quiz._id,
+            title: quiz.title,
+            instructions: quiz.instructions,
+            duration: quiz.duration,
+            totalMarks: quiz.totalMarks,
+            passMark: quiz.passMark,
+            maxAttempts: quiz.maxAttempts || 1
+          },
+          questions: sanitizedQuestions
+        }
+      });
+    }
+
+    // 2. Count completed non-test attempts for this user and quiz
+    const completedAttemptsCount = await QuizAttempt.countDocuments({
+      quiz: quiz._id,
+      learner: userId,
+      status: { $in: ['submitted', 'expired'] },
+      isTestAttempt: false
+    });
+
+    const maxAllowed = quiz.maxAttempts || 1;
+
+    // TASK 3: Configurable Maximum Attempts enforcement for learners
+    if (!isOwnerInstructor && completedAttemptsCount >= maxAllowed) {
+      return res.status(409).json({
+        success: false,
+        message: `Maximum attempt limit reached. You have completed ${completedAttemptsCount} of ${maxAllowed} allowed attempt(s).`,
+        completedAttempts: completedAttemptsCount,
+        maxAttempts: maxAllowed
+      });
+    }
+
+    // Fetch questions securely without answer keys (zero answer leakage before submission)
     const sanitizedQuestions = await QuizQuestion.find({ quiz: quiz._id }).sort({ order: 1 });
 
     if (sanitizedQuestions.length === 0) {
@@ -94,10 +126,14 @@ const startAttempt = async (req, res, next) => {
       });
     }
 
+    const nextAttemptNumber = isOwnerInstructor ? 1 : (completedAttemptsCount + 1);
+
     // Create new attempt
     const newAttempt = await QuizAttempt.create({
       quiz: quiz._id,
-      learner: learnerId,
+      learner: userId,
+      attemptNumber: nextAttemptNumber,
+      isTestAttempt: isOwnerInstructor,
       startedAt: new Date(),
       status: 'in_progress',
       totalPossibleMarks: quiz.totalMarks,
@@ -106,7 +142,9 @@ const startAttempt = async (req, res, next) => {
 
     res.status(201).json({
       success: true,
-      message: 'Quiz attempt started successfully',
+      message: isOwnerInstructor
+        ? 'Instructor test attempt started successfully'
+        : 'Quiz attempt started successfully',
       data: {
         attempt: newAttempt,
         quiz: {
@@ -115,7 +153,8 @@ const startAttempt = async (req, res, next) => {
           instructions: quiz.instructions,
           duration: quiz.duration,
           totalMarks: quiz.totalMarks,
-          passMark: quiz.passMark
+          passMark: quiz.passMark,
+          maxAttempts: quiz.maxAttempts || 1
         },
         questions: sanitizedQuestions
       }
@@ -336,7 +375,7 @@ const getAttemptById = async (req, res, next) => {
 const getMyAttempts = async (req, res, next) => {
   try {
     const attempts = await QuizAttempt.find({ learner: req.user._id })
-      .populate('quiz', 'title duration passMark totalMarks availableFrom availableUntil')
+      .populate('quiz', 'title duration passMark totalMarks maxAttempts availableFrom availableUntil')
       .sort({ createdAt: -1 });
 
     res.status(200).json({
@@ -370,7 +409,8 @@ const getQuizSubmissions = async (req, res, next) => {
       });
     }
 
-    let attemptsQuery = QuizAttempt.find({ quiz: quiz._id }).sort({ createdAt: -1 });
+    // Exclude instructor preview test attempts so student class statistics remain 100% accurate
+    let attemptsQuery = QuizAttempt.find({ quiz: quiz._id, isTestAttempt: { $ne: true } }).sort({ createdAt: -1 });
 
     // Safe populate only if Member 01 User model has been registered
     if (mongoose.models.User) {
@@ -390,6 +430,14 @@ const getQuizSubmissions = async (req, res, next) => {
       ? (completed.reduce((acc, a) => acc + a.percentage, 0) / totalSubmissions).toFixed(1)
       : 0;
 
+    // Task 4: Highest / Lowest per-learner marks
+    const scores = completed.map((a) => a.score);
+    const percentages = completed.map((a) => a.percentage);
+    const highestScore = scores.length > 0 ? Math.max(...scores) : null;
+    const lowestScore = scores.length > 0 ? Math.min(...scores) : null;
+    const highestPercentage = percentages.length > 0 ? Math.max(...percentages) : null;
+    const lowestPercentage = percentages.length > 0 ? Math.min(...percentages) : null;
+
     res.status(200).json({
       success: true,
       data: {
@@ -405,7 +453,11 @@ const getQuizSubmissions = async (req, res, next) => {
           failedCount: totalSubmissions - passedCount,
           passRate: totalSubmissions > 0 ? ((passedCount / totalSubmissions) * 100).toFixed(1) : 0,
           avgScore,
-          avgPercentage
+          avgPercentage,
+          highestScore,
+          lowestScore,
+          highestPercentage,
+          lowestPercentage
         },
         submissions: attempts
       }

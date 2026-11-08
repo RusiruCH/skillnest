@@ -1,9 +1,9 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Clock, Award, Calendar, Users, Edit3, Trash2, ArrowRight } from 'lucide-react';
+import { Clock, Award, Calendar, Users, Edit3, Trash2, ArrowRight, BookOpen } from 'lucide-react';
 
 const QuizCard = ({ quiz, userRole, onDelete, onTogglePublish }) => {
-  const isInstructorOrAdmin = userRole === 'instructor' || userRole === 'administrator';
+  const isInstructorOrAdmin = userRole === 'instructor' || userRole === 'admin' || userRole === 'administrator';
 
   const getStatusBadge = () => {
     switch (quiz.status) {
@@ -59,13 +59,19 @@ const QuizCard = ({ quiz, userRole, onDelete, onTogglePublish }) => {
       </p>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 6, fontSize: '0.825rem', color: 'var(--text-muted)', marginBottom: 20 }}>
+        {quiz.courseId && (quiz.courseId.title || quiz.courseId._id) && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            <BookOpen size={15} />
+            <span>Course: <strong>{quiz.courseId.title || String(quiz.courseId)}</strong></span>
+          </div>
+        )}
         <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
           <Clock size={15} />
           <span>Duration: <strong>{quiz.duration} mins</strong></span>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
           <Award size={15} />
-          <span>Pass Mark: <strong>{quiz.passMark}%</strong> ({quiz.totalMarks} total marks)</span>
+          <span>Pass Mark: <strong>{quiz.passMark}%</strong> • Max Attempts: <strong>{quiz.maxAttempts || 1}</strong></span>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
           <Calendar size={15} />

@@ -9,6 +9,7 @@ import QuizEditPage from './pages/quiz/QuizEditPage';
 import QuizAttemptPage from './pages/quiz/QuizAttemptPage';
 import QuizResultPage from './pages/quiz/QuizResultPage';
 import QuizSubmissionsPage from './pages/quiz/QuizSubmissionsPage';
+import MyAttemptsPage from './pages/quiz/MyAttemptsPage';
 
 function App() {
   // Support three roles: Administrator, Instructor, Learner
@@ -38,6 +39,9 @@ function App() {
             <div className="nav-links">
               <Link to="/quizzes" className="btn btn-outline" style={{ padding: '6px 12px', fontSize: '0.85rem' }}>
                 <Compass size={15} /> All Quizzes
+              </Link>
+              <Link to="/my-attempts" className="btn btn-outline" style={{ padding: '6px 12px', fontSize: '0.85rem' }}>
+                My Attempts
               </Link>
 
               {/* Role Switcher for Testing Acceptance Scenarios */}
@@ -81,6 +85,8 @@ function App() {
             <Route path="/quizzes/:id/attempt" element={<QuizAttemptPage userRole={currentRole} />} />
             <Route path="/attempts/:id/result" element={<QuizResultPage userRole={currentRole} />} />
             <Route path="/quizzes/:id/submissions" element={<QuizSubmissionsPage userRole={currentRole} />} />
+            <Route path="/my-attempts" element={<MyAttemptsPage userRole={currentRole} />} />
+            <Route path="/quizzes/my-attempts" element={<MyAttemptsPage userRole={currentRole} />} />
             <Route path="*" element={<Navigate to="/quizzes" replace />} />
           </Routes>
         </main>

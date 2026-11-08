@@ -128,6 +128,31 @@ const QuizAttemptPage = () => {
 
   return (
     <div className="container" style={{ maxWidth: 850 }}>
+
+      {/* Instructor Preview Banner */}
+      {attempt?.isTestAttempt && (
+        <div
+          style={{
+            background: '#fef3c7',
+            border: '1px solid #f59e0b',
+            borderRadius: 8,
+            padding: '12px 20px',
+            marginBottom: 16,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 10
+          }}
+        >
+          <span style={{ fontSize: '1.1rem' }}>👁️</span>
+          <div>
+            <strong style={{ color: '#78350f' }}>Instructor Preview Mode</strong>
+            <span style={{ color: '#92400e', fontSize: '0.875rem', marginLeft: 8 }}>
+              This is a test attempt. It will not count toward learner statistics, attempt limits, or class pass rates.
+            </span>
+          </div>
+        </div>
+      )}
+
       {/* Sticky Top Bar with Title, Progress and Countdown */}
       <div
         className="card"

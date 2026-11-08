@@ -37,6 +37,7 @@ import QuizEditPage from './pages/quiz/QuizEditPage';
 import QuizAttemptPage from './pages/quiz/QuizAttemptPage';
 import QuizResultPage from './pages/quiz/QuizResultPage';
 import QuizSubmissionsPage from './pages/quiz/QuizSubmissionsPage';
+import MyAttemptsPage from './pages/quiz/MyAttemptsPage';
 
 function App() {
   return (
@@ -80,6 +81,8 @@ function App() {
               <Route path="/quizzes/:id/attempt" element={<QuizAttemptPage />} />
               <Route path="/attempts/:id/result" element={<QuizResultPage />} />
               <Route path="/quizzes/:id/submissions" element={<QuizSubmissionsPage />} />
+              <Route path="/my-attempts" element={<MyAttemptsPage />} />
+              <Route path="/quizzes/my-attempts" element={<MyAttemptsPage />} />
 
               {/* Module 2: Admin Approval Management Routes */}
               <Route path="/admin/dashboard" element={<AdminDashboard />} />
