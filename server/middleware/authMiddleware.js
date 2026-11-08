@@ -1,6 +1,18 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 
+// Helper to get verified JWT secret with strict production check
+const getJwtSecret = () => {
+  const secret = process.env.JWT_SECRET;
+  if (!secret) {
+    if (process.env.NODE_ENV === 'production') {
+      throw new Error('JWT_SECRET is missing in production environment');
+    }
+    return 'skillnest_jwt_secret_key_member01_bandara_2026';
+  }
+  return secret;
+};
+
 const protect = async (req, res, next) => {
   let token;
 
@@ -10,10 +22,8 @@ const protect = async (req, res, next) => {
   ) {
     try {
       token = req.headers.authorization.split(' ')[1];
-      const decoded = jwt.verify(
-        token,
-        process.env.JWT_SECRET || 'skillnest_jwt_secret_key_member01_bandara_2026'
-      );
+      const secret = getJwtSecret();
+      const decoded = jwt.verify(token, secret);
 
       const user = await User.findById(decoded.id).select('-password');
       if (!user) {
@@ -26,6 +36,12 @@ const protect = async (req, res, next) => {
       req.user = user;
       return next();
     } catch (error) {
+      if (process.env.NODE_ENV === 'production' && !process.env.JWT_SECRET) {
+        return res.status(500).json({
+          success: false,
+          message: 'Server configuration error: JWT_SECRET is mandatory in production.',
+        });
+      }
       return res.status(401).json({
         success: false,
         message: 'Invalid or expired authorization token.',
@@ -49,10 +65,8 @@ const optionalProtect = async (req, res, next) => {
   ) {
     try {
       const token = req.headers.authorization.split(' ')[1];
-      const decoded = jwt.verify(
-        token,
-        process.env.JWT_SECRET || 'skillnest_jwt_secret_key_member01_bandara_2026'
-      );
+      const secret = getJwtSecret();
+      const decoded = jwt.verify(token, secret);
       const user = await User.findById(decoded.id).select('-password');
       if (user) req.user = user;
     } catch (err) {
