@@ -7,6 +7,7 @@ import {
   Moon,
   Bookmark,
   Share2,
+  GitFork,
   Download,
   FolderOpen,
   Sparkles,
@@ -30,12 +31,14 @@ export default function EditorHeader({
   isRunning,
   onOpenSaveModal,
   onOpenShareModal,
+  onForkSnippet,
   onOpenVaultModal,
   onOpenTemplateModal,
   onDownloadCode,
   isWebMode,
   onToggleWebMode,
-  snippetTitle
+  snippetTitle,
+  activeSnippet
 }) {
   return (
     <div className="bg-[#161b22] border-b border-gray-800 px-4 py-2.5 flex flex-wrap items-center justify-between gap-3 select-none">
@@ -183,6 +186,16 @@ export default function EditorHeader({
           >
             <Share2 className="w-4 h-4" />
           </button>
+
+          {activeSnippet && (
+            <button
+              onClick={onForkSnippet}
+              className="p-1.5 rounded-lg bg-[#0d1117] hover:bg-gray-800 border border-gray-800 text-gray-300 hover:text-purple-400 transition"
+              title="Fork this snippet (create your own copy)"
+            >
+              <GitFork className="w-4 h-4" />
+            </button>
+          )}
 
           <button
             onClick={onDownloadCode}

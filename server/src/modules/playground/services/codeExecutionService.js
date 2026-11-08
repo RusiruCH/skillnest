@@ -106,9 +106,11 @@ async function executeViaWandbox(langConfig, code, stdin) {
   let sourceCode = code;
 
   // In Java on Wandbox, file is compiled as prog.java.
-  // Transform 'public class' to 'class' so prog.java compiles without naming conflicts.
+  // Transform 'public class' to 'class' and remove package declarations so prog.java compiles cleanly.
   if (langConfig.language === 'java') {
-    sourceCode = code.replace(/\bpublic\s+class\b/, 'class');
+    sourceCode = code
+      .replace(/\bpackage\s+[a-zA-Z0-9_.]+;\s*/g, '')
+      .replace(/\bpublic\s+class\b/g, 'class');
   }
 
   const payload = {
@@ -118,8 +120,11 @@ async function executeViaWandbox(langConfig, code, stdin) {
   };
 
   const response = await axios.post(WANDBOX_API_URL, payload, {
-    headers: { 'Content-Type': 'application/json' },
-    timeout: 30000 // 30 seconds HTTP network timeout guard (needed for JVM/Java compilation)
+    headers: {
+      'Content-Type': 'application/json',
+      'User-Agent': 'SkillNest-Runner/1.0'
+    },
+    timeout: 45000 // 45 seconds HTTP network timeout guard (generous buffer for remote JVM compilation)
   });
 
   const data = response.data;
@@ -257,7 +262,7 @@ export const executeCode = async ({ language, code, stdin = '' }) => {
         success: false,
         status: 'time_limit_exceeded',
         stdout: '',
-        stderr: 'Execution timed out. Code execution exceeded the safe duration limit (30 seconds).',
+        stderr: 'Execution timed out. Code execution exceeded the safe duration limit (45 seconds).',
         exitCode: -1,
         executionTimeMs,
         language: validation.normalizedLang,

@@ -66,6 +66,10 @@ const SnippetSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Snippet',
       default: null
+    },
+    forkCount: {
+      type: Number,
+      default: 0
     }
   },
   {

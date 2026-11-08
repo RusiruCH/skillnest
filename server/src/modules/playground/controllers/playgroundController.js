@@ -333,12 +333,13 @@ export const getAllSnippets = async (req, res) => {
       query.tags = tag.toLowerCase().trim();
     }
 
-    // Text search
+    // Text search (safely escaping regex special characters such as 'c++' or brackets)
     if (search && search.trim()) {
+      const safeSearch = search.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
       query.$or = [
-        { title: { $regex: search.trim(), $options: 'i' } },
-        { description: { $regex: search.trim(), $options: 'i' } },
-        { tags: { $in: [new RegExp(search.trim(), 'i')] } }
+        { title: { $regex: safeSearch, $options: 'i' } },
+        { description: { $regex: safeSearch, $options: 'i' } },
+        { tags: { $in: [new RegExp(safeSearch, 'i')] } }
       ];
     }
 
@@ -594,6 +595,9 @@ export const forkSnippet = async (req, res) => {
       userName: req.user ? req.user.name : 'Guest',
       forkedFrom: original._id
     });
+
+    // Increment fork count on parent snippet
+    await Snippet.findByIdAndUpdate(original._id, { $inc: { forkCount: 1 } });
 
     res.status(201).json({
       success: true,

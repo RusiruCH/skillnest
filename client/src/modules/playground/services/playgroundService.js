@@ -27,9 +27,26 @@ export const getAuthHeaders = () => {
  * Check if a user is currently authenticated in the shared system
  */
 export const getCurrentAuthUser = () => {
+  const storedUser = localStorage.getItem('skillnest_user');
+  if (storedUser) {
+    try {
+      const parsed = JSON.parse(storedUser);
+      if (parsed && (parsed.id || parsed._id)) {
+        return {
+          id: parsed.id || parsed._id,
+          name: parsed.name || parsed.username || parsed.fullName || 'User',
+          email: parsed.email,
+          role: parsed.role
+        };
+      }
+    } catch (e) {
+      // Continue to token parsing
+    }
+  }
+
   const token =
-    localStorage.getItem('token') ||
     localStorage.getItem('skillnest_token') ||
+    localStorage.getItem('token') ||
     localStorage.getItem('auth_token') ||
     localStorage.getItem('jwt');
 
@@ -40,7 +57,8 @@ export const getCurrentAuthUser = () => {
     return {
       id: payload.id || payload._id || payload.userId || payload.sub,
       name: payload.name || payload.username || payload.fullName || 'User',
-      email: payload.email
+      email: payload.email,
+      role: payload.role
     };
   } catch (e) {
     return null;

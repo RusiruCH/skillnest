@@ -12,6 +12,7 @@ import {
   Shield,
   MessageSquare,
   Award,
+  Terminal,
 } from 'lucide-react';
 
 const Navbar = () => {
@@ -131,6 +132,19 @@ const Navbar = () => {
           >
             <Award className="w-4 h-4 text-amber-500" />
             Quizzes
+          </Link>
+
+          {/* Module 03: Code Playground (Member 03) */}
+          <Link
+            to="/playground"
+            className={`px-3.5 py-2 rounded-xl text-sm font-semibold transition flex items-center gap-2 ${
+              isActive('/playground')
+                ? 'bg-emerald-50 text-emerald-600 font-bold'
+                : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+            }`}
+          >
+            <Terminal className="w-4 h-4 text-emerald-500" />
+            Playground
           </Link>
 
           {user?.role === 'learner' && (
