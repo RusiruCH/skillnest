@@ -12,6 +12,7 @@ import {
   fetchSupportedLanguages,
   executeCodeApi,
   fetchSnippetByIdApi,
+  forkSnippetApi,
   getCurrentAuthUser
 } from '../services/playgroundService';
 import { STARTER_TEMPLATES } from '../data/starterTemplates';
@@ -230,8 +231,29 @@ export default function PlaygroundPage() {
         const langObj = languages.find((l) => l.id === selectedLanguage);
         setCode(STARTER_TEMPLATES[selectedLanguage]?.[0]?.code || langObj?.defaultCode || '');
       }
+      setActiveSnippet(null);
+      setSearchParams({});
       setOutput({ stdout: '', stderr: '', status: 'idle' });
       showToast('Reset to starter template', 'info');
+    }
+  };
+
+  // 7. Fork Current Snippet
+  const handleForkSnippet = async () => {
+    if (!activeSnippet?._id) {
+      showToast('No saved snippet is currently loaded to fork.', 'warning');
+      return;
+    }
+    try {
+      showToast('Forking snippet...', 'info');
+      const res = await forkSnippetApi(activeSnippet._id);
+      if (res.success && res.data) {
+        loadSnippetIntoWorkspace(res.data);
+        showToast(`Forked snippet as "${res.data.title}"`, 'success');
+      }
+    } catch (err) {
+      console.error('Fork snippet failed:', err);
+      showToast(err.response?.data?.error || 'Failed to fork snippet.', 'error');
     }
   };
 
@@ -324,12 +346,14 @@ export default function PlaygroundPage() {
         isRunning={isRunning}
         onOpenSaveModal={() => setIsSaveModalOpen(true)}
         onOpenShareModal={() => setIsShareModalOpen(true)}
+        onForkSnippet={handleForkSnippet}
         onOpenVaultModal={() => setIsVaultModalOpen(true)}
         onOpenTemplateModal={() => setIsTemplateModalOpen(true)}
         onDownloadCode={handleDownloadCode}
         isWebMode={isWebMode}
         onToggleWebMode={handleToggleWebMode}
         snippetTitle={activeSnippet?.title}
+        activeSnippet={activeSnippet}
       />
 
       {/* Mobile Tab Switcher (Visible only on small viewports) */}

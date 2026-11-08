@@ -76,7 +76,7 @@ export default function SaveSnippetModal({
       };
 
       let result;
-      if (activeSnippet && activeSnippet._id && activeSnippet.userId === currentUser?.id) {
+      if (activeSnippet && activeSnippet._id && activeSnippet.userId && String(activeSnippet.userId) === String(currentUser?.id)) {
         result = await updateSnippetApi(activeSnippet._id, payload);
       } else {
         result = await createSnippetApi(payload);
@@ -95,7 +95,7 @@ export default function SaveSnippetModal({
     }
   };
 
-  const isOwner = activeSnippet && currentUser && String(activeSnippet.userId) === String(currentUser.id);
+  const isOwner = Boolean(activeSnippet && currentUser && activeSnippet.userId && String(activeSnippet.userId) === String(currentUser.id));
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm animate-fadeIn">

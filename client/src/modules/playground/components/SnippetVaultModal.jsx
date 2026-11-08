@@ -10,10 +10,11 @@ import {
   Trash2,
   Globe,
   Lock,
+  GitFork,
   Loader2,
   AlertCircle
 } from 'lucide-react';
-import { fetchSnippetsApi, fetchSnippetByIdApi, deleteSnippetApi } from '../services/playgroundService';
+import { fetchSnippetsApi, fetchSnippetByIdApi, deleteSnippetApi, forkSnippetApi } from '../services/playgroundService';
 
 export default function SnippetVaultModal({
   isOpen,
@@ -78,6 +79,22 @@ export default function SnippetVaultModal({
       }
     } catch (err) {
       setErrorMessage('Could not load selected snippet.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleFork = async (e, id) => {
+    e.stopPropagation();
+    try {
+      setLoading(true);
+      const res = await forkSnippetApi(id);
+      if (res.data) {
+        onLoadSnippet(res.data);
+        onClose();
+      }
+    } catch (err) {
+      alert(err.response?.data?.error || 'Failed to fork snippet.');
     } finally {
       setLoading(false);
     }
@@ -267,6 +284,13 @@ export default function SnippetVaultModal({
                   </div>
 
                   <div className="flex items-center space-x-2 shrink-0 self-end sm:self-center">
+                    <button
+                      onClick={(e) => handleFork(e, snippet._id)}
+                      className="p-1.5 rounded-lg text-gray-500 hover:text-purple-400 hover:bg-gray-800 transition"
+                      title="Fork snippet (create copy)"
+                    >
+                      <GitFork className="w-4 h-4" />
+                    </button>
                     {isOwner && (
                       <button
                         onClick={(e) => handleDelete(e, snippet._id)}
