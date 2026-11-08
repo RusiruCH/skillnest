@@ -103,6 +103,10 @@ const seedChallenges = require('./utils/challengeSeeder');
 app.use('/api/challenges', challengeRoutes);
 app.use('/api/submissions', submissionRoutes);
 
+// Module 06: Forum & Q&A Management Routes (Member 06)
+const forumRoutes = require('./routes/forumRoutes');
+app.use('/api/forum', forumRoutes);
+
 // Module 04 Demo Seeder
 app.post('/api/challenges/seed', async (req, res) => {
   try {

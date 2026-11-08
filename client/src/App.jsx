@@ -25,6 +25,10 @@ import ChallengeDetailPage from './pages/ChallengeDetailPage';
 import InstructorChallengeDashboard from './pages/InstructorChallengeDashboard';
 import LearnerSubmissionsPage from './pages/LearnerSubmissionsPage';
 
+// Module 06: Forum & Q&A Management (Member 06)
+import ForumPage from './pages/ForumPage';
+import ForumThreadPage from './pages/ForumThreadPage';
+
 function App() {
   return (
     <AuthProvider>
@@ -54,6 +58,10 @@ function App() {
               <Route path="/challenges/:id" element={<ChallengeDetailPage />} />
               <Route path="/challenges/my-submissions" element={<LearnerSubmissionsPage />} />
               <Route path="/instructor/challenges" element={<InstructorChallengeDashboard />} />
+
+              {/* Module 06: Forum & Q&A Management Routes (Member 06) */}
+              <Route path="/forum" element={<ForumPage />} />
+              <Route path="/forum/:id" element={<ForumThreadPage />} />
 
               {/* Module 2: Admin Approval Management Routes */}
               <Route path="/admin/dashboard" element={<AdminDashboard />} />
