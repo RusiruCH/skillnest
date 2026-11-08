@@ -1,8 +1,8 @@
+
 {
   "name": "skillnest-server",
   "version": "1.0.0",
-  "description": "SkillNest Open Course-ware Platform - Backend API (Module 1: Course & Learning Material Management)",
-  "author": "L.M.R.C.Bandara (SEU/IS/22/ICT/113)",
+  "description": "SkillNest Open Course-ware Platform - Backend API",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
@@ -11,19 +11,22 @@
     "test:approval": "node tests/approvalAuth.test.js",
     "test:suite": "node utils/testSuite.js",
     "test:e2e": "node utils/e2eTestSuite.js",
-    "test": "node utils/testSuite.js && node utils/e2eTestSuite.js && node tests/approvalAuth.test.js"
+    "test:playground": "node src/tests/phase4_integration.test.js",
+    "test": "node utils/testSuite.js && node utils/e2eTestSuite.js && node tests/approvalAuth.test.js && node src/tests/phase4_integration.test.js"
   },
   "dependencies": {
+    "axios": "^1.7.9",
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
-    "dotenv": "^16.4.5",
-    "express": "^4.19.2",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "express-rate-limit": "^7.5.0",
     "iconv-lite": "^0.7.3",
-    "jsonwebtoken": "^9.0.2",
-    "mongoose": "^8.4.0",
+    "jsonwebtoken": "^9.0.3",
+    "mongoose": "^8.9.5",
     "multer": "^1.4.5-lts.1"
   },
   "devDependencies": {
-    "nodemon": "^3.1.2"
+    "nodemon": "^3.1.9"
   }
 }

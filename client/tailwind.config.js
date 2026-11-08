@@ -16,9 +16,17 @@ export default {
           800: '#3730a3',
           900: '#312e81',
         },
+        playground: {
+          bg: '#0d1117',
+          sidebar: '#161b22',
+          panel: '#1f242c',
+          border: '#30363d',
+          accent: '#238636',
+          text: '#c9d1d9',
+          muted: '#8b949e',
+        },
       },
     },
   },
   plugins: [],
 };
-

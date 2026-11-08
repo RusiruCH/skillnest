@@ -10,9 +10,11 @@ import CourseEditor from './pages/CourseEditor';
 import CurriculumBuilder from './pages/CurriculumBuilder';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
-import PlaygroundPage from './pages/PlaygroundPage';
 
-// Module 2: Instructor & Course Approval Management — Member 02
+// Module 03: Code Playground (Member 03)
+import { PlaygroundPage } from './modules/playground';
+
+// Module 02: Instructor & Course Approval Management (Member 02)
 import AdminDashboard from './pages/AdminDashboard';
 import InstructorApplications from './pages/InstructorApplications';
 import CourseApprovals from './pages/CourseApprovals';
@@ -84,7 +86,7 @@ function App() {
               <Route path="/my-attempts" element={<MyAttemptsPage />} />
               <Route path="/quizzes/my-attempts" element={<MyAttemptsPage />} />
 
-              {/* Module 2: Admin Approval Management Routes */}
+              {/* Module 02: Admin Approval Management Routes */}
               <Route path="/admin/dashboard" element={<AdminDashboard />} />
               <Route path="/admin/applications" element={<InstructorApplications />} />
               <Route path="/admin/courses" element={<CourseApprovals />} />

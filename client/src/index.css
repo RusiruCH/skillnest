@@ -30,6 +30,21 @@ pre, code {
   background: #94a3b8;
 }
 
+/* Custom scrollbars for dark playground workspace */
+.playground-dark ::-webkit-scrollbar-track,
+.dark ::-webkit-scrollbar-track {
+  background: #161b22;
+}
+.playground-dark ::-webkit-scrollbar-thumb,
+.dark ::-webkit-scrollbar-thumb {
+  background: #30363d;
+  border-radius: 4px;
+}
+.playground-dark ::-webkit-scrollbar-thumb:hover,
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #484f58;
+}
+
 /* ==========================================================================
    Member 05: Quiz & Assessment Management Module Styles
    ========================================================================== */
@@ -328,4 +343,3 @@ pre, code {
     grid-template-columns: 1fr;
   }
 }
-
