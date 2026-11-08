@@ -17,7 +17,7 @@ function LandingPlaceholder() {
         to="/playground"
         className="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white font-medium px-5 py-2.5 rounded-lg text-sm transition shadow-lg shadow-emerald-900/30"
       >
-        <span>Open Code Playground (Member 03)</span>
+        <span>Open Code Playground</span>
         <ArrowRight className="w-4 h-4" />
       </Link>
     </div>
