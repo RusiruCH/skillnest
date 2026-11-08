@@ -1,0 +1,16 @@
+{
+  "name": "skillnest",
+  "version": "1.0.0",
+  "description": "SkillNest – Open Course-ware and Technical Skill Development Platform (MERN) | SWT22022 IAD Group B",
+  "scripts": {
+    "dev:server": "npm --prefix server run dev",
+    "start:server": "npm --prefix server start",
+    "dev:client": "npm --prefix client run dev",
+    "build:client": "npm --prefix client run build",
+    "install:server": "npm --prefix server install",
+    "install:client": "npm --prefix client install"
+  },
+  "keywords": ["mern", "courseware", "code-playground"],
+  "author": "SkillNest Team",
+  "license": "ISC"
+}
