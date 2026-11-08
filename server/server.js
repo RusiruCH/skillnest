@@ -7,6 +7,12 @@ const connectDB = require('./config/db');
 // Load environment variables
 dotenv.config();
 
+// Production security guard: fail startup if JWT_SECRET is missing in production
+if (process.env.NODE_ENV === 'production' && !process.env.JWT_SECRET) {
+  console.error('[FATAL CONFIGURATION ERROR] JWT_SECRET environment variable is mandatory in production.');
+  process.exit(1);
+}
+
 // Connect to MongoDB
 connectDB();
 
