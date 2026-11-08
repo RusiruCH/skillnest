@@ -25,22 +25,25 @@ export const optionalAuth = (req, res, next) => {
 
     if (!secret) {
       if (isProduction) {
-        console.error('[Security Alert] JWT_SECRET environment variable is missing in production. Token verification rejected.');
-        req.user = null;
-        return next();
+        // Fail securely – do not fall back to dev secret
+        return res.status(500).json({
+          success: false,
+          error: 'Server configuration error: JWT_SECRET is required in production.'
+        });
       } else {
         console.warn('[Security Warning] JWT_SECRET is not set in development. Using development test secret.');
       }
     }
 
-    const verificationSecret = secret || 'dev_only_jwt_placeholder_secret';
+    const verificationSecret = secret;
 
     try {
       const decoded = jwt.verify(token, verificationSecret);
       req.user = {
         id: decoded.id || decoded._id || decoded.userId || decoded.sub,
         name: decoded.name || decoded.username || decoded.fullName || 'User',
-        email: decoded.email
+        email: decoded.email,
+        role: decoded.role
       };
     } catch (err) {
       // In production, strictly reject invalid or tampered tokens
@@ -49,17 +52,10 @@ export const optionalAuth = (req, res, next) => {
         return next();
       }
 
-      // In local development only, allow inspected payload with warning for testing across unmerged branches
-      const decoded = jwt.decode(token);
-      if (decoded && (decoded.id || decoded._id || decoded.userId || decoded.sub)) {
-        req.user = {
-          id: decoded.id || decoded._id || decoded.userId || decoded.sub,
-          name: decoded.name || decoded.username || decoded.fullName || 'User',
-          email: decoded.email
-        };
-      } else {
-        req.user = null;
-      }
+      // In development, do NOT decode unverified token for auth purposes.
+      // Simply treat as unauthenticated.
+      req.user = null;
+      return next();
     }
 
     next();

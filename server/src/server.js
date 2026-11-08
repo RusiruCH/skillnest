@@ -2,10 +2,17 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import rateLimit from 'express-rate-limit';
+dotenv.config();
+
 import { connectDB } from './config/db.js';
 import playgroundRoutes from './modules/playground/playground.routes.js';
+import approvalRoutes from './modules/approval/index.js';
 
-dotenv.config();
+if (process.env.NODE_ENV === 'production' && !process.env.JWT_SECRET) {
+  console.error('Fatal: JWT_SECRET is required in production.');
+  process.exit(1);
+}
+
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -35,6 +42,7 @@ const playgroundLimiter = rateLimit({
 
 // Member 03: Code Playground Module Routes
 app.use('/api/playground', playgroundLimiter, playgroundRoutes);
+app.use('/api', approvalRoutes);
 
 // Base health check route
 app.get('/api/health', (req, res) => {
@@ -45,9 +53,13 @@ app.get('/api/health', (req, res) => {
   });
 });
 
-app.listen(PORT, () => {
-  console.log(`[SkillNest Server] Running on http://localhost:${PORT}`);
-  console.log(`[Member 03] Code Playground routes mounted at http://localhost:${PORT}/api/playground`);
-});
+// Only start the HTTP server when this file is run directly (not imported by tests)
+const isMain = process.argv[1] && process.argv[1].replace(/\\/g, '/').endsWith('server.js');
+if (isMain) {
+  app.listen(PORT, () => {
+    console.log(`[SkillNest Server] Running on http://localhost:${PORT}`);
+    console.log(`[Member 03] Code Playground routes mounted at http://localhost:${PORT}/api/playground`);
+  });
+}
 
 export default app;

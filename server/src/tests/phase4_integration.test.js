@@ -8,6 +8,11 @@ import Snippet from '../modules/playground/models/Snippet.js';
 import * as playgroundController from '../modules/playground/controllers/playgroundController.js';
 import * as playgroundAuth from '../modules/playground/middleware/playgroundAuth.js';
 
+// Ensure test environment has a JWT secret for development/testing
+if (!process.env.JWT_SECRET) {
+  process.env.JWT_SECRET = 'test_jwt_secret_placeholder_only';
+}
+
 async function runPhase4IntegrationTests() {
   console.log('====================================================');
   console.log('  SKILLNEST: MEMBER 03 CODE PLAYGROUND PHASE 4 TESTS');
