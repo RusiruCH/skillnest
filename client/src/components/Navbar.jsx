@@ -11,6 +11,7 @@ import {
   Code,
   Shield,
   MessageSquare,
+  Award,
 } from 'lucide-react';
 
 const Navbar = () => {
@@ -117,6 +118,19 @@ const Navbar = () => {
           >
             <MessageSquare className="w-4 h-4 text-indigo-500" />
             Forum & Q&A
+          </Link>
+
+          {/* Module 05: Quiz & Assessment Management */}
+          <Link
+            to="/quizzes"
+            className={`px-3.5 py-2 rounded-xl text-sm font-semibold transition flex items-center gap-2 ${
+              isActive('/quizzes') || location.pathname.startsWith('/quizzes')
+                ? 'bg-amber-50 text-amber-600 font-bold'
+                : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+            }`}
+          >
+            <Award className="w-4 h-4 text-amber-500" />
+            Quizzes
           </Link>
 
           {user?.role === 'learner' && (

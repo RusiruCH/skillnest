@@ -62,5 +62,25 @@ const optionalProtect = async (req, res, next) => {
   next();
 };
 
-module.exports = { protect, optionalProtect };
+/**
+ * Role-based authorization guard
+ * Supports standard roles ('admin', 'administrator', 'instructor', 'learner')
+ */
+const authorize = (...roles) => {
+  const allowedRoles = [...roles];
+  if (roles.includes('admin') && !allowedRoles.includes('administrator')) allowedRoles.push('administrator');
+  if (roles.includes('administrator') && !allowedRoles.includes('admin')) allowedRoles.push('admin');
+
+  return (req, res, next) => {
+    if (!req.user || !allowedRoles.includes(req.user.role)) {
+      return res.status(403).json({
+        success: false,
+        message: `Forbidden: Role '${req.user?.role || 'unassigned'}' is not authorized to access this resource`
+      });
+    }
+    next();
+  };
+};
+
+module.exports = { protect, optionalProtect, authorize };
 

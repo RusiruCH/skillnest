@@ -29,6 +29,15 @@ import LearnerSubmissionsPage from './pages/LearnerSubmissionsPage';
 import ForumPage from './pages/ForumPage';
 import ForumThreadPage from './pages/ForumThreadPage';
 
+// Module 05: Quiz & Assessment Management (Member 05)
+import QuizListPage from './pages/quiz/QuizListPage';
+import QuizDetailPage from './pages/quiz/QuizDetailPage';
+import QuizCreatePage from './pages/quiz/QuizCreatePage';
+import QuizEditPage from './pages/quiz/QuizEditPage';
+import QuizAttemptPage from './pages/quiz/QuizAttemptPage';
+import QuizResultPage from './pages/quiz/QuizResultPage';
+import QuizSubmissionsPage from './pages/quiz/QuizSubmissionsPage';
+
 function App() {
   return (
     <AuthProvider>
@@ -62,6 +71,15 @@ function App() {
               {/* Module 06: Forum & Q&A Management Routes (Member 06) */}
               <Route path="/forum" element={<ForumPage />} />
               <Route path="/forum/:id" element={<ForumThreadPage />} />
+
+              {/* Module 05: Quiz & Assessment Management Routes (Member 05) */}
+              <Route path="/quizzes" element={<QuizListPage />} />
+              <Route path="/quizzes/create" element={<QuizCreatePage />} />
+              <Route path="/quizzes/:id" element={<QuizDetailPage />} />
+              <Route path="/quizzes/:id/edit" element={<QuizEditPage />} />
+              <Route path="/quizzes/:id/attempt" element={<QuizAttemptPage />} />
+              <Route path="/attempts/:id/result" element={<QuizResultPage />} />
+              <Route path="/quizzes/:id/submissions" element={<QuizSubmissionsPage />} />
 
               {/* Module 2: Admin Approval Management Routes */}
               <Route path="/admin/dashboard" element={<AdminDashboard />} />

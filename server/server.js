@@ -107,6 +107,12 @@ app.use('/api/submissions', submissionRoutes);
 const forumRoutes = require('./routes/forumRoutes');
 app.use('/api/forum', forumRoutes);
 
+// Module 05: Quiz & Assessment Management Routes (Member 05)
+const quizRoutes = require('./routes/quizRoutes');
+const attemptRoutes = require('./routes/attemptRoutes');
+app.use('/api/quizzes', quizRoutes);
+app.use('/api/attempts', attemptRoutes);
+
 // Module 04 Demo Seeder
 app.post('/api/challenges/seed', async (req, res) => {
   try {
