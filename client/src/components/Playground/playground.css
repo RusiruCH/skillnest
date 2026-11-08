@@ -1,0 +1,771 @@
+/* ============================================================
+   SkillNest - Module 3: Code Playground Developer Dark Theme
+   ============================================================ */
+
+.pg-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+}
+
+/* Header & Top Bar */
+.pg-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  background: #111a31;
+  padding: 14px 20px;
+  border-radius: 14px;
+  border: 1px solid #223055;
+  color: #f1f4fb;
+  box-shadow: 0 4px 20px rgba(10, 15, 30, 0.25);
+}
+
+.pg-brand-meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.pg-brand-meta h2 {
+  font: 800 18px Manrope, sans-serif;
+  margin: 0;
+  color: #fff;
+  letter-spacing: -0.3px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.pg-brand-meta p {
+  margin: 0;
+  font-size: 11px;
+  color: #929db7;
+}
+
+.pg-top-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* Primary Toolbar */
+.pg-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #18223d;
+  padding: 10px 16px;
+  border-radius: 12px;
+  border: 1px solid #273761;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.pg-toolbar-left,
+.pg-toolbar-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.pg-lang-selector {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #0f162a;
+  border: 1px solid #2d3e6e;
+  border-radius: 8px;
+  padding: 6px 12px;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.pg-lang-selector select {
+  background: transparent;
+  border: 0;
+  color: #fff;
+  font-weight: 700;
+  font-size: 12px;
+  outline: none;
+  cursor: pointer;
+}
+
+.pg-lang-selector select option {
+  background: #111a31;
+  color: #fff;
+}
+
+/* Toolbar Buttons */
+.pg-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all 0.15s ease;
+  user-select: none;
+}
+
+.pg-btn:hover {
+  transform: translateY(-1px);
+}
+
+.pg-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.pg-btn-run {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: #ffffff;
+  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35);
+  padding: 8px 18px;
+}
+
+.pg-btn-run:hover:not(:disabled) {
+  background: linear-gradient(135deg, #059669 0%, #047857 100%);
+  box-shadow: 0 6px 18px rgba(16, 185, 129, 0.45);
+}
+
+.pg-btn-secondary {
+  background: #243358;
+  color: #d1d9ec;
+  border: 1px solid #364877;
+}
+
+.pg-btn-secondary:hover:not(:disabled) {
+  background: #2f4270;
+  color: #ffffff;
+  border-color: #485f98;
+}
+
+.pg-btn-danger {
+  background: rgba(239, 68, 68, 0.15);
+  color: #fca5a5;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.pg-btn-danger:hover:not(:disabled) {
+  background: rgba(239, 68, 68, 0.25);
+  color: #fee2e2;
+  border-color: rgba(239, 68, 68, 0.5);
+}
+
+.pg-btn-active {
+  background: #735ce0 !important;
+  color: #ffffff !important;
+  border-color: #8c7be4 !important;
+}
+
+/* Status Indicator */
+.pg-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+}
+
+.pg-status-idle {
+  background: #1e293b;
+  color: #94a3b8;
+  border: 1px solid #334155;
+}
+
+.pg-status-running {
+  background: rgba(59, 130, 246, 0.15);
+  color: #60a5fa;
+  border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+.pg-status-success {
+  background: rgba(16, 185, 129, 0.15);
+  color: #34d399;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.pg-status-error {
+  background: rgba(239, 68, 68, 0.15);
+  color: #f87171;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.pg-status-timeout {
+  background: rgba(245, 158, 11, 0.15);
+  color: #fbbf24;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.pg-status-demo {
+  background: rgba(217, 119, 6, 0.2);
+  color: #fcd34d;
+  border: 1px solid rgba(217, 119, 6, 0.4);
+}
+
+.pg-pulse-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+  display: inline-block;
+  animation: pgPulse 1.5s infinite;
+}
+
+@keyframes pgPulse {
+  0% { opacity: 0.4; transform: scale(0.9); }
+  50% { opacity: 1; transform: scale(1.15); }
+  100% { opacity: 0.4; transform: scale(0.9); }
+}
+
+/* Playground Main Grid */
+.pg-workspace-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(360px, 1fr);
+  gap: 16px;
+  align-items: stretch;
+}
+
+/* Editor Section */
+.pg-editor-box {
+  background: #1e1e1e;
+  border: 1px solid #2d3748;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
+  min-height: 580px;
+}
+
+.pg-editor-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #181818;
+  padding: 10px 16px;
+  border-bottom: 1px solid #2d2d2d;
+  color: #cccccc;
+}
+
+.pg-tab-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #252526;
+  padding: 5px 12px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-family: 'Consolas', 'JetBrains Mono', monospace;
+  color: #e2e8f0;
+  border: 1px solid #333;
+}
+
+.pg-tab-pill .dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #735ce0;
+}
+
+.pg-editor-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 11px;
+  color: #888;
+}
+
+.pg-editor-canvas {
+  flex: 1;
+  min-height: 440px;
+  position: relative;
+  background: #1e1e1e;
+}
+
+/* Fallback Textarea Editor if Monaco is offline or fails */
+.pg-fallback-editor {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  min-height: 440px;
+  background: #1e1e1e;
+}
+
+.pg-fallback-lines {
+  background: #252526;
+  color: #858585;
+  padding: 14px 10px;
+  font: 12px/1.6 'Consolas', monospace;
+  text-align: right;
+  user-select: none;
+  border-right: 1px solid #333;
+}
+
+.pg-fallback-textarea {
+  flex: 1;
+  background: transparent;
+  color: #d4d4d4;
+  border: none;
+  outline: none;
+  padding: 14px 16px;
+  font: 12px/1.6 'Consolas', monospace;
+  resize: none;
+  white-space: pre;
+  tab-size: 4;
+}
+
+.pg-editor-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #181818;
+  padding: 8px 16px;
+  border-top: 1px solid #282828;
+  font-size: 11px;
+  color: #71717a;
+}
+
+/* Standard Input (Stdin) Box */
+.pg-stdin-panel {
+  border-top: 1px solid #2d2d2d;
+  background: #141414;
+  padding: 12px 16px;
+}
+
+.pg-stdin-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.pg-stdin-header span {
+  font-size: 11px;
+  font-weight: 700;
+  color: #94a3b8;
+  letter-spacing: 0.5px;
+}
+
+.pg-stdin-textarea {
+  width: 100%;
+  background: #1e1e1e;
+  border: 1px solid #334155;
+  border-radius: 6px;
+  color: #cbd5e1;
+  font: 12px/1.5 'Consolas', monospace;
+  padding: 8px 12px;
+  resize: vertical;
+  min-height: 60px;
+  max-height: 140px;
+  outline: none;
+}
+
+.pg-stdin-textarea:focus {
+  border-color: #735ce0;
+}
+
+/* Output Console Section */
+.pg-console-box {
+  background: #0d1117;
+  border: 1px solid #21262d;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
+  min-height: 580px;
+}
+
+.pg-console-tabs {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #161b22;
+  border-bottom: 1px solid #21262d;
+  padding: 6px 12px;
+}
+
+.pg-tab-group {
+  display: flex;
+  gap: 4px;
+}
+
+.pg-tab-btn {
+  background: transparent;
+  border: none;
+  color: #8b949e;
+  padding: 6px 12px;
+  font-size: 11px;
+  font-weight: 700;
+  border-radius: 6px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.15s;
+}
+
+.pg-tab-btn:hover {
+  color: #c9d1d9;
+  background: #21262d;
+}
+
+.pg-tab-btn.active {
+  color: #ffffff;
+  background: #30363d;
+}
+
+.pg-tab-badge {
+  font-size: 9px;
+  padding: 2px 6px;
+  border-radius: 10px;
+  background: rgba(239, 68, 68, 0.2);
+  color: #f87171;
+}
+
+.pg-console-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.pg-icon-action {
+  background: transparent;
+  border: none;
+  color: #8b949e;
+  cursor: pointer;
+  padding: 6px 8px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 600;
+  transition: color 0.15s, background 0.15s;
+}
+
+.pg-icon-action:hover {
+  color: #f0f6fc;
+  background: #21262d;
+}
+
+/* Console Content Areas */
+.pg-console-viewport {
+  flex: 1;
+  padding: 16px;
+  overflow-y: auto;
+  font: 12px/1.65 'Consolas', 'JetBrains Mono', monospace;
+  color: #c9d1d9;
+  background: #0d1117;
+  max-height: 480px;
+}
+
+.pg-stdout {
+  margin: 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+  color: #38bdf8;
+}
+
+.pg-stdout.empty {
+  color: #64748b;
+  font-style: italic;
+}
+
+.pg-stderr-box {
+  background: rgba(239, 68, 68, 0.08);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  border-radius: 8px;
+  padding: 14px;
+  margin-bottom: 12px;
+}
+
+.pg-stderr-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 700;
+  font-size: 12px;
+  color: #f87171;
+  margin-bottom: 8px;
+}
+
+.pg-stderr-content {
+  margin: 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+  color: #fca5a5;
+  font: 11px/1.6 'Consolas', monospace;
+}
+
+/* Demo Notice Banner */
+.pg-demo-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  background: rgba(217, 119, 6, 0.12);
+  border: 1px solid rgba(217, 119, 6, 0.35);
+  color: #fcd34d;
+  padding: 10px 14px;
+  border-radius: 8px;
+  margin-bottom: 12px;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.pg-demo-banner p {
+  margin: 0;
+}
+
+.pg-demo-banner b {
+  color: #fef3c7;
+}
+
+/* History Modal / Drawer */
+.pg-history-drawer {
+  background: #111a31;
+  border: 1px solid #273761;
+  border-radius: 14px;
+  padding: 20px;
+  box-shadow: 0 10px 35px rgba(0, 0, 0, 0.3);
+  margin-top: 10px;
+}
+
+.pg-history-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #233157;
+}
+
+.pg-history-header h3 {
+  font: 800 16px Manrope, sans-serif;
+  color: #fff;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.pg-history-list {
+  display: grid;
+  gap: 10px;
+  max-height: 380px;
+  overflow-y: auto;
+}
+
+.pg-history-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #172240;
+  border: 1px solid #23325c;
+  border-radius: 10px;
+  padding: 12px 16px;
+  transition: all 0.15s ease;
+  gap: 12px;
+}
+
+.pg-history-item:hover {
+  background: #1c2b52;
+  border-color: #3b5088;
+}
+
+.pg-history-meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  flex: 1;
+}
+
+.pg-lang-badge {
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  background: #2b3a67;
+  color: #8da4db;
+  white-space: nowrap;
+}
+
+.pg-lang-badge.python { background: #1e3a5f; color: #60a5fa; }
+.pg-lang-badge.javascript { background: #3b3617; color: #facc15; }
+.pg-lang-badge.java { background: #3c2317; color: #fb923c; }
+.pg-lang-badge.c { background: #26334f; color: #93c5fd; }
+.pg-lang-badge.cpp { background: #1c324a; color: #38bdf8; }
+
+.pg-history-info {
+  min-width: 0;
+  display: grid;
+  gap: 3px;
+}
+
+.pg-history-info b {
+  font-size: 12px;
+  color: #e2e8f0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-family: 'Consolas', monospace;
+}
+
+.pg-history-info small {
+  font-size: 10px;
+  color: #94a3b8;
+}
+
+.pg-history-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.pg-empty-history {
+  text-align: center;
+  padding: 30px;
+  color: #8895b3;
+  font-size: 12px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1080px) {
+  .pg-workspace-grid {
+    grid-template-columns: 1fr;
+  }
+  .pg-editor-box,
+  .pg-console-box {
+    min-height: 480px;
+  }
+}
+
+@media (max-width: 640px) {
+  .pg-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .pg-toolbar-left,
+  .pg-toolbar-right {
+    justify-content: space-between;
+  }
+  .pg-topbar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .pg-top-actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+}
+
+/* ============================================================
+   Authentication Status & Error Alerts (Member 3 - Auth Fix)
+   ============================================================ */
+
+.pg-status-badge.pg-status-auth-error {
+  background: rgba(239, 68, 68, 0.15);
+  color: #f87171;
+  border-color: rgba(239, 68, 68, 0.35);
+}
+
+.pg-auth-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.12) 0%, rgba(153, 27, 27, 0.16) 100%);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: 12px;
+  padding: 16px 20px;
+  color: #fecaca;
+  animation: pgFadeIn 0.25s ease-out;
+}
+
+.pg-auth-banner-icon {
+  background: rgba(239, 68, 68, 0.2);
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  color: #f87171;
+  border-radius: 10px;
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.pg-auth-banner-content {
+  flex: 1;
+}
+
+.pg-auth-banner-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #fca5a5;
+  margin-bottom: 4px;
+}
+
+.pg-auth-banner-text {
+  font-size: 12px;
+  color: #e2e8f0;
+  margin: 0 0 12px 0;
+  line-height: 1.5;
+}
+
+.pg-auth-banner-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.pg-auth-error-card {
+  background: #19141d;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: 10px;
+  padding: 14px 16px;
+  margin-bottom: 12px;
+}
+
+.pg-auth-error-card-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #f87171;
+  font-size: 13px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.pg-auth-error-card-body {
+  font-size: 12px;
+  color: #cbd5e1;
+  line-height: 1.5;
+  margin: 0 0 12px 0;
+}
+
+.pg-auth-error-card-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+
